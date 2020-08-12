@@ -6,6 +6,7 @@ from telebot import types
 import config
 
 bot = telebot.TeleBot(config.TOKEN)
+TIME_FOR_ALARM = {}
 
 
 @bot.message_handler(commands=['start'])
@@ -17,8 +18,9 @@ def send_welcome(message):
     markup_for_time_setting.add('Set Time')
     bot.send_message(message.chat.id, f'Welcome {message.from_user.first_name}! '
                                       f'\nI am a <b>specific</b> alarm bot!'
-                                      f'\nChoose regularity of an alarm!'
-                     , parse_mode='html', reply_markup=markup_for_time_setting)
+                                      f'\nChoose regularity of an alarm!',
+                     parse_mode='html', reply_markup=markup_for_time_setting
+                     )
 
 
 def choose_alarm():
@@ -47,8 +49,10 @@ def is_valid_time_for_alarm(message) -> bool:
     elif re.match('(^([0-9]{1,2}):([0-9]{2})$)', message.text):
         time_list = message.text.split(':')
         print(time_list)
-        if int(time_list[0]) < 24:
+        if int(time_list[0]) < 24 and int(time_list[1]) < 60:
             is_time_valid = True
+            TIME_FOR_ALARM['time'] = ":".join(time_list)
+            print(TIME_FOR_ALARM.get('time'))
         else:
             bot.send_message(message.chat.id, text='I support only 24 hours format, please set correct time')
     else:
